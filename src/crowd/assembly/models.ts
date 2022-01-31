@@ -31,10 +31,10 @@ export class Campaign {
       public state: States;
       private description: String;
       private name: String;
-      private lifetime: String;
+      private lifetime: u128;
       // private time: String; ? Set end block - block at which the campaign should end.
 
-      constructor(goal: u128, description: String, name: String, lifetime: String) {
+      constructor(goal: u128, description: String, name: String, lifetime: u128) {
         this.creator = Context.sender;
         this.backers = new Map<AccountId, Backer>();
         this.goal = u128.mul(u128.from(goal),ONE_NEAR);
@@ -84,9 +84,14 @@ export class Campaign {
             }
             case States.FAIL:{
                 logging.log(`Campaign FAILED to meet its goal in ${this.lifetime}! Funds will be returned to backers.`);
-                
-                // this.payed = true;
-                // this.locked = false;
+                let b = this.backers.values();
+                for (let index = 0; index < b.length; index++) {
+                  this.vault = u128.sub(this.vault,b[index].contribution);
+                  ContractPromiseBatch.create(b[index].id).transfer(b[index].contribution);
+                }                
+                this.payed = true;
+                this.locked = false;
+
                 break;
             }
             case States.ACTIVE:{
@@ -107,10 +112,17 @@ export class Campaign {
           this.state = States.SUCCESS;
         } 
         //TODO: create lifetime
-        if((this.goal > this.vault) && this.lifetime) {
+        if(this.goal > this.vault) {
           this.state = States.ACTIVE;
           this.locked = true;
-        } 
+        }
+        
+        if((u128.from(Context.blockTimestamp) > u128.from(this.lifetime)) && (this.goal > this.vault)) {
+          logging.log(Context.blockTimestamp);
+          logging.log(this.lifetime);
+          this.state = States.FAIL;
+        }
+        
       }
 }
 
