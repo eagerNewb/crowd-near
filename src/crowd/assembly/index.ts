@@ -21,17 +21,18 @@ export const ids = new PersistentSet<AccountId>("ci");
   - goal: 1500 (N)
   - description: Help us create the new portable flamethrower!
   - name: Portable flamethrower
-  - lifetime: 20/02/2022 - dd/mm/yyyy
+  - lifetime: timestamp
 */
-export function initCampaign(goal: u128, description: String, name: String, lifetime: String, ): AccountId {  
-  const c = createOrEdit(goal, description, name, lifetime);
+export function initCampaign(goal: u128, description: String, name: String, lifetime: u128): AccountId {  
+  const c = createOrEdit(goal, description, name, u128.from(lifetime));
   return c.creator;
+  
 }
 
 /*
   backCampaign()
   Args
-  - cid: The creator/owner of the campaign you want to back.
+  - cid: The campaign you want to back.
 */
 export function backCampaign(cid: AccountId): void {
   const c = getCampaign(cid);
@@ -53,6 +54,9 @@ export function closeCampaign(): void {
   
 } 
 
+/*
+  Returns a list of campaigns.
+*/
 export function getCampaigns(): void {
   const iterable = ids.values();
   for (let index = 0; index < iterable.length; index++) {
@@ -69,7 +73,7 @@ export function getCampaigns(): void {
   Decides wether to return campaign in storage || overwrite with new campaign 
   Based on locked and payed campaign params.
 */
-function createOrEdit(goal: u128, description: String, name: String, lifetime: String): Campaign {
+function createOrEdit(goal: u128, description: String, name: String, lifetime: u128): Campaign {
   if (storage.hasKey(Context.sender)) {
     let c: Campaign = getCampaign(Context.sender);
     assert(!c.isLocked(), "Campaign is Locked!");
@@ -87,6 +91,7 @@ function createOrEdit(goal: u128, description: String, name: String, lifetime: S
 
   return c;
 }
+
 /*
   Returns a campaign based on its id.
 */
@@ -97,10 +102,13 @@ export function getCampaign(cid: AccountId): Campaign {
 /*
   Gather scattered testing funds.
   Place your accountId in ContractPromiseBatch.create();
-  E.g ContractPromiseBatch.create("test.testnet");
 */
 export function returnBalance(): u128 {
+  assert(getCampaign(Context.sender), "You can not withdraw funds. No campaigns in your name!");
   const payout = u128.sub(u128.from(Context.accountBalance), u128.mul(u128.from(3),ONE_NEAR));
-  ContractPromiseBatch.create("kalikartel.testnet").transfer(payout);
+
+  // E.g ContractPromiseBatch.create("test.testnet");
+  ContractPromiseBatch.create(Context.sender).transfer(payout);
+
   return payout;
 }

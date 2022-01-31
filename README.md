@@ -6,6 +6,7 @@
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
 Crowd is a crowd funding dApp built on near protocol!
+_a simple prototype_
 
 - Create your campaign!
 - Blockchain security by default!
@@ -81,6 +82,17 @@ near call dev-1643474469513-99630285886186 getCampaigns --accountId example.test
 ```sh
  near call dev-1643474469513-99630285886186 backCampaign '{"cid": "example.testnet"}' --accountId mytest.testnet --deposit 1
 ```
+
+##
+##
+## What's left?
+- payout calculation, currently contributions above the goal, stay in the contract.
+- sh scripts
+- lifetime for campaigns
+- payout logic in case campaign fails
+- more detailed fields for the Campaign
+- tests - yeah, I've heard of TDD, and tests should come first. For now it's just a mock-up.
+- Front end
 
 ##
 ##
