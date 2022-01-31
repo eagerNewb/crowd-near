@@ -4,7 +4,7 @@ import { u128, logging, PersistentSet, Context, ContractPromiseBatch } from 'nea
 import { AccountId, ONE_NEAR, MIN_ACCOUNT_BALANCE, asNEAR } from '../../utils';
 import { Campaign } from './models';
 
-export const ids = new PersistentSet<AccountId>("ci");
+export const ownerIds = new PersistentSet<AccountId>("ci");
 
 /* 
   RULES:
@@ -21,7 +21,7 @@ export const ids = new PersistentSet<AccountId>("ci");
   - goal: 1500 (N)
   - description: Help us create the new portable flamethrower!
   - name: Portable flamethrower
-  - lifetime: timestamp
+  - lifetime: timestamp integer
 */
 export function initCampaign(goal: u128, description: String, name: String, lifetime: u128): AccountId {  
   const c = createOrEdit(goal, description, name, u128.from(lifetime));
@@ -55,17 +55,12 @@ export function closeCampaign(): void {
 } 
 
 /*
-  Returns a list of campaigns.
+  Logs campaigns.
 */
 export function getCampaigns(): void {
-  const iterable = ids.values();
-  for (let index = 0; index < iterable.length; index++) {
-    const element = iterable[index];
-    logging.log(getCampaign(element));
-    var date = new Date(Context.blockTimestamp * 1000);
-    
-    // Hours part from the timestamp
-    logging.log(`The current blockIndex is: ${Context.blockIndex.toString()} and timestamp is ${date.getTime()}!`);
+  const ids = ownerIds.values();
+  for (let i = 0; i < ids.length; i++) {
+    logging.log(getCampaign(ids[i]));
   }
 }
 
@@ -84,8 +79,8 @@ function createOrEdit(goal: u128, description: String, name: String, lifetime: u
   
   let c = new Campaign(goal, description, name, lifetime);
   
-  if(!ids.has(c.creator)) {
-    ids.add(c.creator);
+  if(!ownerIds.has(c.creator)) {
+    ownerIds.add(c.creator);
   }
   storage.set(Context.sender, c);
 

@@ -20,6 +20,7 @@ export enum States {
     SUCCESS,
     FAIL,
 };
+
 @nearBindgen
 export class Campaign {
       public creator: AccountId;
@@ -32,7 +33,6 @@ export class Campaign {
       private description: String;
       private name: String;
       private lifetime: u128;
-      // private time: String; ? Set end block - block at which the campaign should end.
 
       constructor(goal: u128, description: String, name: String, lifetime: u128) {
         this.creator = Context.sender;
@@ -45,7 +45,7 @@ export class Campaign {
         this.name =  name;       
         this.lifetime = lifetime; 
       }
-      // funds campaign
+
       public back(): void {
         assert(this.state == States.ACTIVE, `Campaign has reached it's goal of ${this.vault} and is ${this.state}!`);
 
@@ -67,6 +67,7 @@ export class Campaign {
       public isPayed(): bool {
           return this.payed;
       }
+
       // closes campaign
       public close(): void {
         
@@ -75,9 +76,7 @@ export class Campaign {
 
                 const p = ContractPromiseBatch
                           .create(this.creator)
-                          .transfer(this.goal);
-
-                this.vault = u128.sub(this.vault, this.goal);
+                          .transfer(this.vault);
                 this.payed = true;
                 this.locked = false;
                 break;
@@ -85,9 +84,9 @@ export class Campaign {
             case States.FAIL:{
                 logging.log(`Campaign FAILED to meet its goal in ${this.lifetime}! Funds will be returned to backers.`);
                 let b = this.backers.values();
-                for (let index = 0; index < b.length; index++) {
-                  this.vault = u128.sub(this.vault,b[index].contribution);
-                  ContractPromiseBatch.create(b[index].id).transfer(b[index].contribution);
+                for (let i = 0; i < b.length; i++) {
+                  this.vault = u128.sub(this.vault, b[i].contribution);
+                  ContractPromiseBatch.create(b[i].id).transfer(b[i].contribution);
                 }                
                 this.payed = true;
                 this.locked = false;
