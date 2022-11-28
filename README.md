@@ -1,5 +1,5 @@
 # Crowd
-## _Blockchain crowdfunding made simple!_
+## _Blockchain crowdfunding made simple_
 
 [![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
 
@@ -22,7 +22,7 @@ _a simple prototype_
 
 Crowd uses a number of open source projects to work properly:
 
-- [NEAR protocol] - Layer 1 blockchain solution living on top of ETHEREUM!
+- [NEAR protocol] - Layer 1 blockchain solution living on top of ethereum.
 - [near-sdk-as] - web assembly translation for near contracts.
 - [Learn-NEAR] - https://github.com/Learn-NEAR/starter--near-sdk-as
 
