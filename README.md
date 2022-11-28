@@ -91,7 +91,6 @@ near call dev-1643474469513-99630285886186 getCampaigns --accountId example.test
 - lifetime for campaigns
 - payout logic in case campaign fails
 - more detailed fields for the Campaign
-- tests - yeah, I've heard of TDD, and tests should come first. For now it's just a mock-up.
 - Front end
 
 ##
